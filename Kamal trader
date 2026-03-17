@@ -1,0 +1,40 @@
+# 1. Install Plotly for interactive charts
+!pip install yfinance plotly pandas --quiet
+
+import yfinance as yf
+import plotly.graph_objects as px
+from plotly.subplots import make_subplots
+
+# 2. Data Fetching (Nifty 50 & Sensex)
+def create_terminal_html():
+    symbol = "^NSEI" # Nifty 50
+    df = yf.download(symbol, period="5d", interval="15m")
+
+    # Indicators
+    df['EMA_9'] = df['Close'].ewm(span=9, adjust=False).mean()
+    df['EMA_21'] = df['Close'].ewm(span=21, adjust=False).mean()
+
+    # Create Interactive Chart
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
+                       vertical_spacing=0.03, subplot_titles=(f'Live {symbol} Terminal', 'Volume'), 
+                       row_width=[0.2, 0.7])
+
+    # Candlestick Chart
+    fig.add_trace(px.Candlestick(x=df.index, open=df['Open'], high=df['High'],
+                                low=df['Low'], close=df['Close'], name="Market"), row=1, col=1)
+
+    # Adding EMA Lines
+    fig.add_trace(px.Scatter(x=df.index, y=df['EMA_9'], line=dict(color='blue', width=1), name="EMA 9"), row=1, col=1)
+    fig.add_trace(px.Scatter(x=df.index, y=df['EMA_21'], line=dict(color='orange', width=1), name="EMA 21"), row=1, col=1)
+
+    # Adding Volume
+    fig.add_trace(px.Bar(x=df.index, y=df['Volume'], name="Volume"), row=2, col=1)
+
+    # Style
+    fig.update_layout(template="plotly_dark", xaxis_rangeslider_visible=False, height=800)
+    
+    # 3. Save as HTML file
+    fig.write_html("market_terminal.html")
+    print("✅ market_terminal.html file create ho gayi hai! Left sidebar (Files) mein check karein.")
+
+create_terminal_html()
