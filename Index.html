@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Star Game v3</title>
+    <style>
+        body { font-family: 'Comic Sans MS', cursive; text-align: center; background-color: #e3f2fd; margin: 0; padding: 20px; }
+        .game-card { background: white; border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: auto; border: 4px solid #ff9800; }
+        .timer { font-size: 20px; color: #f44336; font-weight: bold; margin-bottom: 10px; }
+        .ques-text { font-size: 60px; color: #1e88e5; margin: 20px 0; font-weight: bold; }
+        input { font-size: 35px; width: 120px; text-align: center; border: 3px solid #ddd; border-radius: 15px; padding: 10px; margin-bottom: 20px; outline: none; }
+        .btn { background: #4caf50; color: white; border: none; padding: 15px 40px; font-size: 22px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px #2e7d32; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px #2e7d32; }
+        .score { font-size: 25px; color: #ff9800; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <div class="timer" id="timerDisplay">Time: 15s</div>
+    <div class="ques-text" id="questionBox">...</div>
+    <input type="number" id="userAnswer" placeholder="?" inputmode="numeric">
+    <br>
+    <button class="btn" onclick="check()">CHECK</button>
+    <div class="score" id="scoreDisplay">Stars: ⭐ 0</div>
+</div>
+
+<script>
+    let num1, num2, correct, score = 0, timer, timeLeft = 15;
+
+    function startNewRound() {
+        clearInterval(timer);
+        timeLeft = 15;
+        document.getElementById('timerDisplay').innerText = "Time: " + timeLeft + "s";
+        document.getElementById('userAnswer').value = "";
+        document.getElementById('userAnswer').focus();
+
+        // Mode Decide Karna (1: Plus, 2: Minus, 3: Multi)
+        // Hamne 1-3 tak range rakhi hai taaki Multiplication pakka aaye
+        let mode = Math.floor(Math.random() * 3) + 1;
+
+        if (mode === 1) { // Plus (+)
+            num1 = Math.floor(Math.random() * 10) + 1;
+            num2 = Math.floor(Math.random() * 10) + 1;
+            correct = num1 + num2;
+            document.getElementById('questionBox').innerText = num1 + " + " + num2;
+        } 
+        else if (mode === 2) { // Minus (-)
+            num1 = Math.floor(Math.random() * 20) + 5;
+            num2 = Math.floor(Math.random() * num1); 
+            correct = num1 - num2;
+            document.getElementById('questionBox').innerText = num1 + " - " + num2;
+        } 
+        else { // Multiplication (x)
+            num1 = Math.floor(Math.random() * 5) + 1; // 1 to 5 tables
+            num2 = Math.floor(Math.random() * 10) + 1; // 1 to 10
+            correct = num1 * num2;
+            document.getElementById('questionBox').innerText = num1 + " × " + num2;
+        }
+
+        // Start Countdown
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timerDisplay').innerText = "Time: " + timeLeft + "s";
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                alert("Time Out! Agla sawal...");
+                startNewRound();
+            }
+        }, 1000);
+    }
+
+    function check() {
+        let ans = document.getElementById('userAnswer').value;
+        if (parseInt(ans) === correct) {
+            score++;
+            document.getElementById('scoreDisplay').innerText = "Stars: ⭐ " + score;
+            startNewRound();
+        } else {
+            alert("Galat! Sahi jawab " + correct + " tha.");
+            startNewRound();
+        }
+    }
+
+    // Pehli baar game shuru karne ke liye
+    window.onload = startNewRound;
+</script>
+
+</body>
+</html>
